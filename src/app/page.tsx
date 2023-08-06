@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios, { AxiosResponse } from 'axios';
 import { Modal } from '@/components/Modal';
 import PhotoUploader from '@/components/Upload';
+import ReactPaginate from 'react-paginate'; // Importe a biblioteca de paginação
 
 interface Photo {
   id: number;
@@ -10,10 +11,13 @@ interface Photo {
   media: string;
 }
 
+const PHOTOS_PER_PAGE = 12; // Defina quantas fotos você deseja exibir por página
+
 const Page: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [imageOfModal, setImageOfModal] = useState<string>('');
   const [photoList, setPhotoList] = useState<Photo[]>([]);
+  const [currentPage, setCurrentPage] = useState<number>(0);
 
   const openModal = (id: number): void => {
     const photo = photoList.find((item) => item.id === id);
@@ -29,12 +33,12 @@ const Page: React.FC = () => {
 
   const handleVideoFullScreen = (videoUrl: string) => {
     const videoElement = document.getElementById('fullscreen-video') as HTMLVideoElement;
-  
+
     if (videoElement) {
       videoElement.src = videoUrl;
       videoElement.controls = true;
       videoElement.autoplay = true;
-  
+
       if (videoElement.requestFullscreen) {
         videoElement.requestFullscreen();
       }
@@ -43,7 +47,7 @@ const Page: React.FC = () => {
 
   const fetchPhotos = () => {
     axios
-      .get('http://189.126.111.192:8000/photos')
+      .get('http://192.168.1.103:8000/photos')
       .then((response: AxiosResponse<Photo[]>) => {
         setPhotoList(response.data);
       })
@@ -52,20 +56,24 @@ const Page: React.FC = () => {
       });
   };
 
-  const handleUploadSuccess = () => {
-    fetchPhotos();
+  const handlePageChange = ({ selected }: { selected: number }) => {
+    setCurrentPage(selected);
   };
 
   useEffect(() => {
     fetchPhotos();
   }, []);
 
+  const startIndex = currentPage * PHOTOS_PER_PAGE;
+  const endIndex = startIndex + PHOTOS_PER_PAGE;
+  const currentPhotos = photoList.slice(startIndex, endIndex);
+
   return (
     <div className="w-screen h-screen text-center flex flex-col">
       <p className="my-4 font-bold text-3xl">XXI CPMONT</p>
-      <PhotoUploader onSuccess={handleUploadSuccess} />
-      <section className="container mx-auto max-w-5xl grid grid-cols-2 gap-8 md:grid-cols-4 xl:grid-cols-6">
-        {photoList.map((item) => (
+      <PhotoUploader onSuccess={fetchPhotos} />
+      <section className="container mx-auto max-w-5xl grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6 mb-2">
+        {currentPhotos.map((item) => (
           <div key={item.id} style={{ width: '100%', paddingTop: '100%', position: 'relative' }}>
             {item.type === 'video' ? (
               <video
@@ -103,6 +111,13 @@ const Page: React.FC = () => {
         ))}
       </section>
 
+      <ReactPaginate
+        pageCount={Math.ceil(photoList.length / PHOTOS_PER_PAGE)}
+        onPageChange={handlePageChange}
+        containerClassName="pagination"
+        activeClassName="active"
+        className='text-white text-center flex flex-line justify-center border rounded-md p-2 mb-4 gap-2 w-screen items-center'
+      />
       {showModal && <Modal media={imageOfModal} closeModal={closeModal} handleVideoFullScreen={handleVideoFullScreen} />}
     </div>
   );
