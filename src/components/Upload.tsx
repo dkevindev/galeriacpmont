@@ -33,7 +33,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onSuccess }) => {
     }
 
     try {
-      const response = await fetch('http://189.126.111.192:9000/upload', {
+      const response = await fetch('http://189.126.111.192:8000/upload', {
         method: 'POST',
         body: formData,
       });

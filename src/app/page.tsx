@@ -43,7 +43,7 @@ const Page: React.FC = () => {
 
   const fetchPhotos = () => {
     axios
-      .get('http://189.126.111.192:9000/photos')
+      .get('http://189.126.111.192:8000/photos')
       .then((response: AxiosResponse<Photo[]>) => {
         setPhotoList(response.data);
       })
