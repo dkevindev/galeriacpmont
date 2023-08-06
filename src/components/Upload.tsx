@@ -6,8 +6,6 @@ interface PhotoUploaderProps {
   onSuccess: () => void;
 }
 
-// ...
-
 const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onSuccess }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +40,7 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onSuccess }) => {
 
       if (data.success) {
         toast.success(data.message);
-        setSelectedFiles([]); // Limpa os arquivos selecionados
+        setSelectedFiles([]);
         onSuccess();
       } else {
         toast.error(data.message);
@@ -51,7 +49,6 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onSuccess }) => {
       toast.error('Erro na requisição.');
     } finally {
       setIsLoading(false);
-      // Limpa o input de seleção de arquivos
       const fileInput = document.getElementById('file-input') as HTMLInputElement;
       if (fileInput) {
         fileInput.value = '';
@@ -63,9 +60,9 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onSuccess }) => {
     <div className="mb-8 flex flex-col text-center justify-center items-center">
       <input
         type="file"
-        id="file-input" // Adicione um ID ao input para referência posterior
+        id="file-input"
         multiple
-        accept="image/*,video/*"
+        accept="image/*,video/*,image/heic"
         onChange={handleFileChange}
         className="my-4"
       />
@@ -82,4 +79,3 @@ const PhotoUploader: React.FC<PhotoUploaderProps> = ({ onSuccess }) => {
 };
 
 export default PhotoUploader;
-
